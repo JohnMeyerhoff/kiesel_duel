@@ -19,7 +19,7 @@ fn main() {
         println!("Spieler {0} am zug mit A={1} und B={2}:",winner,kiesel_a,kiesel_b);
         a_sub = read!();
         b_sub = read!();
-        if a_sub<=kiesel_a && b_sub <=kiesel_b && b_sub == a_sub || b_sub == 0 || a_sub == 0 {
+        if (a_sub<=kiesel_a && b_sub <=kiesel_b) && (b_sub == a_sub || b_sub == 0 || a_sub == 0) {
             kiesel_b = kiesel_b - b_sub;
             kiesel_a = kiesel_a - a_sub;
             zug = zug + 1;

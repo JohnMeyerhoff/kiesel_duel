@@ -1,6 +1,6 @@
 #[macro_use] extern crate text_io;
 fn main() {
-    println!("\nKiselspiel: Wer den letzten Stein nimmt, verliert.");
+    println!("\nKieselspiel: Wer den letzten Stein nimmt, verliert.");
     println!("Die Züge werden im Format a b eingegeben,");
     println!("Es dürfen immer nur von einem Stapel beliebig viele,");
     println!("oder von beiden Stapeln gleichviele Steine entfernt werden.");

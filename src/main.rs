@@ -2,8 +2,9 @@
 
 
 #[macro_use] extern crate rocket;
-use rocket::response::content;
+
 use serde::{Serialize, Deserialize};
+use rocket::serde::json::{json, Value};
 
 fn ma0in() {
     println!("\nKieselspiel: Wer den letzten Stein nimmt, verliert.");
@@ -53,19 +54,18 @@ fn index() -> &'static str {
 }
 
 #[get("/gamestate")]
-fn gamestate() -> content::Json<&'static str> {
-  content::Json("{
-    'status': 'success',
-    'A': '17',
-    'B': '13',
-    'turn': '1',
-    'message': 'There is no message',
-  }")
+fn gamestate() -> Value {
+  json!({
+    "status": "success",
+    "A": "17",
+    "B": "13",
+    "turn": "1",
+    "message": "There is no message",
+  })
 }
 
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-    .mount("/", routes![index])
-    .mount("/state", routes![gamestate])
+    .mount("/", routes![index,gamestate])
 }

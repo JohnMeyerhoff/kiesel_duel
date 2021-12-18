@@ -1,5 +1,11 @@
 #[macro_use] extern crate text_io;
-fn main() {
+
+
+#[macro_use] extern crate rocket;
+use rocket::response::content;
+use serde::{Serialize, Deserialize};
+
+fn ma0in() {
     println!("\nKieselspiel: Wer den letzten Stein nimmt, verliert.");
     println!("Die Züge werden im Format a b eingegeben,");
     println!("Es dürfen immer nur von einem Stapel beliebig viele,");
@@ -37,4 +43,29 @@ fn main() {
 }
 fn winsign(player:i8){
     println!("Spieler {0} hat gewonnen!!!",player);
+}
+
+
+#[get("/")]
+fn index() -> &'static str {
+    "Hello, world!"
+
+}
+
+#[get("/gamestate")]
+fn gamestate() -> content::Json<&'static str> {
+  content::Json("{
+    'status': 'success',
+    'A': '17',
+    'B': '13',
+    'turn': '1',
+    'message': 'There is no message',
+  }")
+}
+
+#[launch]
+fn rocket() -> _ {
+    rocket::build()
+    .mount("/", routes![index])
+    .mount("/state", routes![gamestate])
 }

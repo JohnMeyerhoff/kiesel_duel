@@ -3,8 +3,36 @@
 
 #[macro_use] extern crate rocket;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize};
+use serde::ser::{Serialize, Serializer, SerializeStruct};
 use rocket::serde::json::{json, Value};
+
+struct Stacks {
+     kiesel_a: i8,
+     kiesel_b: i8,
+     winner: i8,
+     a_sub: i8, 
+     b_sub: i8,
+     zug : i8, 
+}
+
+impl Serialize for Stacks {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        // 3 is the number of fields in the struct.
+        let mut state = serializer.serialize_struct("Stacks", 3)?;
+        state.serialize_field("kiesel_a", &self.kiesel_a)?;
+        state.serialize_field("kiesel_b", &self.kiesel_b)?;
+        state.serialize_field("winner", &self.winner)?;
+        state.serialize_field("a_sub", &self.a_sub)?;
+        state.serialize_field("b_sub", &self.b_sub)?;
+        state.serialize_field("zug", &self.zug)?;
+        state.end()
+    }
+}
+
 
 fn ma0in() {
     println!("\nKieselspiel: Wer den letzten Stein nimmt, verliert.");
@@ -17,6 +45,15 @@ fn ma0in() {
     let mut a_sub: i8; 
     let mut b_sub: i8;
     let mut zug = 0; 
+
+    let stapel = Stacks {
+     kiesel_a:  13,
+     kiesel_b:  17,
+     winner: 0,
+     a_sub: 0, 
+     b_sub: 0,
+     zug : 0, 
+    };
     while 0<(kiesel_a+kiesel_b) {
         if zug % 2 == 0 {
             winner = 1;
@@ -46,6 +83,16 @@ fn winsign(player:i8){
     println!("Spieler {0} hat gewonnen!!!",player);
 }
 
+fn get_stapel() -> Stacks{
+    return Stacks {
+     kiesel_a:  13,
+     kiesel_b:  17,
+     winner: 0,
+     a_sub: 0, 
+     b_sub: 0,
+     zug : 0, 
+    };
+}
 
 #[get("/")]
 fn index() -> &'static str {
@@ -53,15 +100,12 @@ fn index() -> &'static str {
 
 }
 
+
+
 #[get("/gamestate")]
 fn gamestate() -> Value {
-  json!({
-    "status": "success",
-    "A": "17",
-    "B": "13",
-    "turn": "1",
-    "message": "There is no message",
-  })
+    
+  json!(get_stapel())
 }
 
 #[launch]

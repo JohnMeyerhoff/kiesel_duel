@@ -1,0 +1,69 @@
+{
+	"info": {
+		"_postman_id": "6fbfdfff-6586-40d8-944e-a077c7ac6bc9",
+		"name": "kiesel_api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Gamestate No Optionals",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/gamestate?show",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"gamestate"
+					],
+					"query": [
+						{
+							"key": "show",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Gamestate With Optionals",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/gamestate?show&takeaway=10",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"gamestate"
+					],
+					"query": [
+						{
+							"key": "show",
+							"value": null
+						},
+						{
+							"key": "takeaway",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

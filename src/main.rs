@@ -107,15 +107,13 @@ fn index() -> &'static str {
 fn gamestate(takeaway:Option<i8>) -> Value {
     let mut a : Stacks;
     match takeaway {
-        Some(b) =>{
-
+        Some(b) => {
             a = get_stapel();
             a.kiesel_a-=b;
         },
-    None =>        a = get_stapel(),
+        None => a = get_stapel(),
     }
-    
-  json!(a)
+    json!(a)
 }
 
 #[launch]

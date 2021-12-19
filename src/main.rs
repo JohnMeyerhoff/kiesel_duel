@@ -102,10 +102,20 @@ fn index() -> &'static str {
 
 
 
-#[get("/gamestate")]
-fn gamestate() -> Value {
+
+#[get("/gamestate?show&<takeaway>")]
+fn gamestate(takeaway:Option<i8>) -> Value {
+    let mut a : Stacks;
+    match takeaway {
+        Some(b) =>{
+
+            a = get_stapel();
+            a.kiesel_a-=b;
+        },
+    None =>        a = get_stapel(),
+    }
     
-  json!(get_stapel())
+  json!(a)
 }
 
 #[launch]

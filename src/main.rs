@@ -16,6 +16,26 @@ struct Stacks {
      zug : i8, 
 }
 
+impl Stacks{
+    pub fn new() -> Self {
+        let kiesel_a: i8 = 13;
+        let kiesel_b: i8 = 17;
+        let winner: i8= 0;
+        let a_sub: i8=0; 
+        let b_sub: i8=0;
+        let zug = 0;
+
+        Stacks {
+            kiesel_a,  
+            kiesel_b,
+            winner,
+            a_sub, 
+            b_sub,
+            zug,
+        }
+    }
+}
+
 impl Serialize for Stacks {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -39,59 +59,39 @@ fn ma0in() {
     println!("Die Züge werden im Format a b eingegeben,");
     println!("Es dürfen immer nur von einem Stapel beliebig viele,");
     println!("oder von beiden Stapeln gleichviele Steine entfernt werden.");
-    let mut kiesel_a: i8 = 13;
-    let mut kiesel_b: i8 = 17;
-    let mut winner: i8;
-    let mut a_sub: i8; 
-    let mut b_sub: i8;
-    let mut zug = 0; 
-
-    let stapel = Stacks {
-     kiesel_a:  13,
-     kiesel_b:  17,
-     winner: 0,
-     a_sub: 0, 
-     b_sub: 0,
-     zug : 0, 
-    };
-    while 0<(kiesel_a+kiesel_b) {
-        if zug % 2 == 0 {
-            winner = 1;
+    let mut status = Stacks::new();
+    while 0<(status.kiesel_a+status.kiesel_b) {
+        if status.zug % 2 == 0 {
+            status.winner = 1;
         }else {
-            winner =2;
+            status.winner =2;
         }
-        println!("Spieler {0} am zug mit A={1} und B={2}:",winner,kiesel_a,kiesel_b);
-        a_sub = read!();
-        b_sub = read!();
-        if (a_sub<=kiesel_a && b_sub <=kiesel_b) && (b_sub == a_sub || b_sub == 0 || a_sub == 0) {
-            kiesel_b = kiesel_b - b_sub;
-            kiesel_a = kiesel_a - a_sub;
-            zug = zug + 1;
+        println!("Spieler {0} am zug mit A={1} und B={2}:",status.winner,status.kiesel_a,status.kiesel_b);
+        status.a_sub = read!();
+        status.b_sub = read!();
+        if (status.a_sub<=status.kiesel_a && status.b_sub <=status.kiesel_b) && (status.b_sub == status.a_sub || status.b_sub == 0 || status.a_sub == 0) {
+            status.kiesel_b = status.kiesel_b - status.b_sub;
+            status.kiesel_a = status.kiesel_a - status.a_sub;
+            status.zug = status.zug + 1;
         } else{
-         println!("Spieler {0} hat eine ungültige Eingabe getätigt,",winner);
+         println!("Spieler {0} hat eine ungültige Eingabe getätigt,",(status.zug % 2 +1));
          println!("es wurden keine Steine entfernt.");
         }
     }
-        if zug % 2 == 0 {
-            winner = 1;
+        if status.zug % 2 == 0 {
+            status.winner = 1;
         }else {
-            winner =2;
+            status.winner =2;
         }
-    winsign(winner);
+    winsign(status.winner);
 }
+
 fn winsign(player:i8){
     println!("Spieler {0} hat gewonnen!!!",player);
 }
 
 fn get_stapel() -> Stacks{
-    return Stacks {
-     kiesel_a:  13,
-     kiesel_b:  17,
-     winner: 0,
-     a_sub: 0, 
-     b_sub: 0,
-     zug : 0, 
-    };
+    return Stacks::new();
 }
 
 #[get("/")]

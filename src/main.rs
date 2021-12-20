@@ -1,11 +1,12 @@
 #[macro_use] extern crate text_io;
-
-
 #[macro_use] extern crate rocket;
 
 use serde::{Deserialize};
 use serde::ser::{Serialize, Serializer, SerializeStruct};
 use rocket::serde::json::{json, Value};
+use rocket::State;
+use rocket::request::{self, Request, FromRequest};
+
 
 struct Stacks {
      kiesel_a: i8,
@@ -94,14 +95,6 @@ fn get_stapel() -> Stacks{
     return Stacks::new();
 }
 
-#[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
-
-}
-
-
-
 
 #[get("/gamestate?show&<takeaway>")]
 fn gamestate(takeaway:Option<i8>) -> Value {
@@ -118,6 +111,16 @@ fn gamestate(takeaway:Option<i8>) -> Value {
 
 #[launch]
 fn rocket() -> _ {
+    let status = Stacks::new();
     rocket::build()
     .mount("/", routes![index,gamestate])
+    .manage(status)
 }
+
+
+#[get("/")]
+fn index() -> &'static str {
+    "Hello, world!"
+
+}
+

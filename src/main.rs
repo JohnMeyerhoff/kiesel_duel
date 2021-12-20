@@ -6,7 +6,8 @@ use serde::ser::{Serialize, Serializer, SerializeStruct};
 use rocket::serde::json::{json, Value};
 use rocket::State;
 use rocket::request::{self, Request, FromRequest};
-
+use std::borrow::BorrowMut;
+use core::ops::DerefMut;
 
 struct Stacks {
      kiesel_a: i8,
@@ -19,12 +20,12 @@ struct Stacks {
 
 impl Stacks{
     pub fn new() -> Self {
-        let kiesel_a: i8 = 13;
-        let kiesel_b: i8 = 17;
-        let winner: i8= 0;
-        let a_sub: i8=0; 
-        let b_sub: i8=0;
-        let zug = 0;
+        let mut kiesel_a: i8 = 13;
+        let mut kiesel_b: i8 = 17;
+        let mut winner: i8= 0;
+        let mut a_sub: i8=0; 
+        let mut b_sub: i8=0;
+        let mut zug = 0;
 
         Stacks {
             kiesel_a,  
@@ -35,7 +36,12 @@ impl Stacks{
             zug,
         }
     }
+    pub fn movel(mut self) {
+        self.zug = self.zug + 1;
+    }
 }
+
+
 
 impl Serialize for Stacks {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -113,7 +119,7 @@ fn gamestate(takeaway:Option<i8>) -> Value {
 fn rocket() -> _ {
     let status = Stacks::new();
     rocket::build()
-    .mount("/", routes![index,gamestate])
+    .mount("/", routes![index,gamestate,count])
     .manage(status)
 }
 
@@ -122,5 +128,11 @@ fn rocket() -> _ {
 fn index() -> &'static str {
     "Hello, world!"
 
+}
+#[get("/count")]
+fn count(mut hit_count: &State<Stacks>) -> String {
+    let current_count = hit_count.zug;
+    hit_count.movel();
+    format!("Number of visits: {}", current_count)
 }
 

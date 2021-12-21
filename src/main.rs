@@ -31,10 +31,15 @@ impl Stacks {
             a_sub: 0,
             b_sub: 0,
             zug: 0,
-            message: format!("\nKieselspiel: Wer den letzten Stein nimmt, verliert."),
+            message: format!(
+                "\nKieselspiel: Wer den letzten Stein nimmt, verliert.
+\nKieselspiel: Wer den letzten Stein nimmt, verliert.\n
+Die Züge werden im Format a b eingegeben,\n
+Es dürfen immer nur von einem Stapel beliebig viele,\n
+oder von beiden Stapeln gleichviele Steine entfernt werden."
+            ),
         }
     }
-    
     fn ziehen(&mut self) {
         let _lock = self.lock.lock().unwrap();
         //Held until end of block
@@ -58,7 +63,6 @@ impl Stacks {
         //Held until end of block
         self.message = message;
     }
-
 }
 
 impl Serialize for Stacks {
@@ -77,16 +81,6 @@ impl Serialize for Stacks {
         state.serialize_field("message", &self.message)?;
         state.end()
     }
-}
-
-fn ma0in() {
-    println!("\nKieselspiel: Wer den letzten Stein nimmt, verliert.");
-    println!("Die Züge werden im Format a b eingegeben,");
-    println!("Es dürfen immer nur von einem Stapel beliebig viele,");
-    println!("oder von beiden Stapeln gleichviele Steine entfernt werden.");
-    let status = Stacks::new();
-    
-    winsign(status.winner);
 }
 
 fn winsign(player: i8) {
@@ -159,6 +153,7 @@ fn modularstate(state: &State<Mutex<Stacks>>, rem_a: Option<i8>, rem_b: Option<i
         } else {
             _lock.winner = 2;
         }
+        winsign(_lock.winner);
     }
     let printable = Stacks {
         lock: Mutex::new(()),
@@ -168,7 +163,7 @@ fn modularstate(state: &State<Mutex<Stacks>>, rem_a: Option<i8>, rem_b: Option<i
         a_sub: _lock.a_sub,
         b_sub: _lock.b_sub,
         zug: _lock.zug,
-        message: format!("{0}",_lock.message),
+        message: format!("{0}", _lock.message),
     };
     json!(printable)
 }

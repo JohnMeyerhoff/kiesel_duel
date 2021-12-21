@@ -3,14 +3,14 @@ extern crate text_io;
 #[macro_use]
 extern crate rocket;
 
-use core::ops::DerefMut;
-use rocket::request::{self, FromRequest, Request};
 use rocket::serde::json::{json, Value};
 use rocket::State;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
+use std::sync::{Mutex};
+//currently no Arc
+//not in use yet:
+use rocket::request::{self, FromRequest, Request};
 use serde::Deserialize;
-use std::borrow::BorrowMut;
-use std::sync::{Arc, Mutex};
 
 struct Stacks {
     lock: Mutex<()>,
@@ -121,7 +121,7 @@ fn gamestate(takeaway: Option<i8>) -> Value {
 
 #[launch]
 fn rocket() -> _ {
-    let mut status = Mutex::new(Stacks::new());
+    let status = Mutex::new(Stacks::new());
     rocket::build()
         .mount("/", routes![index, gamestate, count])
         .manage(status)

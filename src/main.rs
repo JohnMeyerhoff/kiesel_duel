@@ -8,6 +8,7 @@ use std::sync::Mutex;
 //currently no Arc
 //not in use yet:
 use rocket::request::{self, FromRequest, Request};
+use rocket::response::content::Html;
 use serde::Deserialize;
 
 struct Stacks {
@@ -40,6 +41,7 @@ oder von beiden Stapeln gleichviele Steine entfernt werden."
             ),
         }
     }
+
     fn ziehen(&mut self) {
         let _lock = self.lock.lock().unwrap();
         //Held until end of block
@@ -87,34 +89,26 @@ fn winsign(player: i8) {
     println!("Spieler {0} hat gewonnen!!!", player);
 }
 
-fn get_stapel() -> Stacks {
-    return Stacks::new();
-}
-
-#[get("/gamestate?show&<takeaway>")]
-fn gamestate(takeaway: Option<i8>) -> Value {
-    let mut a: Stacks;
-    match takeaway {
-        Some(b) => {
-            a = get_stapel();
-            a.kiesel_a -= b;
-        }
-        None => a = get_stapel(),
-    }
-    json!(a)
-}
-
 #[launch]
 fn rocket() -> _ {
     let status = Mutex::new(Stacks::new());
     rocket::build()
-        .mount("/", routes![index, gamestate, count, modularstate])
+        .mount("/", routes![index, count, modularstate])
         .manage(status)
 }
 
 #[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
+fn index() -> Html<&'static str> {
+    Html(
+        r"
+<html>
+<head>
+<title>Kiesel Duell</title>
+</head>
+<body>Hello, you may visit <a href=http://127.0.0.1:8000/modularstate?move&rem_a=10&rem_b=10>this link</a> to play the game!
+</body>
+</html>",
+    )
 }
 #[get("/count")]
 fn count(state: &State<Mutex<Stacks>>) -> String {

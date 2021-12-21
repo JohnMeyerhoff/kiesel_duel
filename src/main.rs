@@ -1,6 +1,4 @@
 #[macro_use]
-extern crate text_io;
-#[macro_use]
 extern crate rocket;
 
 use rocket::serde::json::{json, Value};
@@ -34,10 +32,35 @@ impl Stacks {
             zug: 0,
         }
     }
-    fn movel(&mut self) {
+    
+    pub fn produce(source: &Stacks) -> Stacks {
+        Stacks {
+            lock: Mutex::new(()),
+            kiesel_a: source.kiesel_a,
+            kiesel_b: source.kiesel_b,
+            winner: source.winner,
+            a_sub: source.a_sub,
+            b_sub: source.b_sub,
+            zug: source.zug,
+        }
+    }
+    
+    fn ziehen(&mut self) {
         let _lock = self.lock.lock().unwrap();
         //Held until end of block
         self.zug += 1;
+    }
+
+    fn sub_a(&mut self,sub : i8) {
+        let _lock = self.lock.lock().unwrap();
+        //Held until end of block
+        self.kiesel_a -= sub;
+    }
+
+    fn sub_b(&mut self,sub : i8) {
+        let _lock = self.lock.lock().unwrap();
+        //Held until end of block
+        self.kiesel_b -= sub;
     }
 }
 
@@ -74,21 +97,10 @@ fn ma0in() {
             "Spieler {0} am zug mit A={1} und B={2}:",
             status.winner, status.kiesel_a, status.kiesel_b
         );
-        status.a_sub = read!();
-        status.b_sub = read!();
-        if (status.a_sub <= status.kiesel_a && status.b_sub <= status.kiesel_b)
-            && (status.b_sub == status.a_sub || status.b_sub == 0 || status.a_sub == 0)
-        {
-            status.kiesel_b = status.kiesel_b - status.b_sub;
-            status.kiesel_a = status.kiesel_a - status.a_sub;
-            status.zug = status.zug + 1;
-        } else {
-            println!(
-                "Spieler {0} hat eine ungültige Eingabe getätigt,",
-                (status.zug % 2 + 1)
-            );
-            println!("es wurden keine Steine entfernt.");
-        }
+        
+
+
+
     }
     if status.zug % 2 == 0 {
         status.winner = 1;
@@ -123,7 +135,7 @@ fn gamestate(takeaway: Option<i8>) -> Value {
 fn rocket() -> _ {
     let status = Mutex::new(Stacks::new());
     rocket::build()
-        .mount("/", routes![index, gamestate, count])
+        .mount("/", routes![index, gamestate, count, modularstate])
         .manage(status)
 }
 
@@ -134,6 +146,46 @@ fn index() -> &'static str {
 #[get("/count")]
 fn count(state: &State<Mutex<Stacks>>) -> String {
     let mut _lock = state.inner().lock().unwrap();
-    _lock.movel();
+    _lock.ziehen();
     format!("Number of visits: {}", _lock.zug)
+}
+
+#[get("/modularstate?move&<rem_a>&<rem_b>")]
+fn modularstate(state: &State<Mutex<Stacks>>, rem_a: Option<i8>, rem_b: Option<i8>) ->  Value {
+    let mut _lock = state.inner().lock().unwrap();
+    
+    match rem_a {
+        Some(a) => {
+            match rem_b {
+                Some(b) => {
+                    if (a <= _lock.kiesel_a && b <= _lock.kiesel_b)
+                    && (b == a || b == 0 || a == 0)
+                    {
+            _lock.ziehen();
+            _lock.sub_a(a);
+            _lock.sub_b(b);
+        } else {
+            println!(
+                "Spieler {0} hat eine ungültige Eingabe getätigt,",
+                (_lock.zug % 2 + 1)
+            );
+        }
+                }
+
+                None =>  println!("es wurden keine Steine entfernt (B-Falsch).")
+            }
+        }
+        None =>  println!("es wurden keine Steine entfernt (A-Falsch).")
+    }
+    
+    let printable = Stacks {
+            lock: Mutex::new(()),
+            kiesel_a: _lock.kiesel_a,
+            kiesel_b: _lock.kiesel_b,
+            winner: _lock.winner,
+            a_sub: _lock.a_sub,
+            b_sub: _lock.b_sub,
+            zug: _lock.zug,
+        };
+    json!(printable)
 }

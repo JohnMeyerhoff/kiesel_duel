@@ -33,8 +33,7 @@ impl Stacks {
             b_sub: 0,
             zug: 0,
             message: format!(
-                "\nKieselspiel: Wer den letzten Stein nimmt, verliert.
-\nKieselspiel: Wer den letzten Stein nimmt, verliert.\n
+                "\nKieselspiel: Wer den letzten Stein nimmt, verliert.\n
 Die Züge werden im Format a b eingegeben,\n
 Es dürfen immer nur von einem Stapel beliebig viele,\n
 oder von beiden Stapeln gleichviele Steine entfernt werden."
@@ -127,6 +126,14 @@ fn modularstate(state: &State<Mutex<Stacks>>, rem_a: Option<i8>, rem_b: Option<i
                     _lock.ziehen();
                     _lock.sub_a(a);
                     _lock.sub_b(b);
+                    let player = _lock.zug % 2 + 1;
+                    let ak = _lock.kiesel_a;
+                    let bk = _lock.kiesel_b;
+
+                    _lock.set_message(format!(
+                        "Spieler {0} ist am zug mit A: {1} und B: {2} ",
+                        player, ak, bk
+                    ));
                 } else {
                     let movenr = _lock.zug;
                     _lock.set_message(format!(

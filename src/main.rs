@@ -97,7 +97,7 @@ fn winsign(player: i8) {
 fn rocket() -> _ {
     let status = Mutex::new(Stacks::new());
     rocket::build()
-        .mount("/", routes![index, count, modularstate])
+        .mount("/", routes![index, count, modularstate, newgame])
         .manage(status)
 }
 
@@ -114,12 +114,32 @@ fn index() -> Html<&'static str> {
 </html>",
     )
 }
+
 #[get("/count")]
 fn count(state: &State<Mutex<Stacks>>) -> String {
     let mut _lock = state.inner().lock().unwrap();
     _lock.ziehen();
     format!("Number of visits: {}", _lock.zug)
 }
+
+
+#[get("/newgame")]
+fn newgame(state: &State<Mutex<Stacks>>) -> Html<&'static str>{
+    let mut _lock = state.inner().lock().unwrap();
+    *_lock = Stacks::new();
+    println!("Spielstand zurueckgesetzt!");
+    return Html(
+        r"
+<html>
+<head>
+<title>Kiesel Duell</title>
+</head>
+<body>Hello, a new game session started!
+</body>
+</html>",
+    )
+}
+
 
 #[get("/modularstate?move&<rem_a>&<rem_b>")]
 fn modularstate(state: &State<Mutex<Stacks>>, rem_a: Option<i8>, rem_b: Option<i8>) -> Value {

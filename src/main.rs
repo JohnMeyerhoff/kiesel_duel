@@ -64,6 +64,11 @@ oder von beiden Stapeln gleichviele Steine entfernt werden."
         //Held until end of block
         self.message = message;
     }
+    fn set_winner(&mut self, winner: i8) {
+        let _lock = self.lock.lock().unwrap();
+        //Held until end of block
+        self.winner = winner;
+    }
 }
 
 impl Serialize for Stacks {
@@ -119,52 +124,62 @@ fn count(state: &State<Mutex<Stacks>>) -> String {
 #[get("/modularstate?move&<rem_a>&<rem_b>")]
 fn modularstate(state: &State<Mutex<Stacks>>, rem_a: Option<i8>, rem_b: Option<i8>) -> Value {
     let mut _lock = state.inner().lock().unwrap();
-    match rem_a {
-        Some(a) => match rem_b {
-            Some(b) => {
-                if (a <= _lock.kiesel_a && b <= _lock.kiesel_b) && (b == a || b == 0 || a == 0) {
-                    _lock.ziehen();
-                    _lock.sub_a(a);
-                    _lock.sub_b(b);
-                    let player = _lock.zug % 2 + 1;
-                    let ak = _lock.kiesel_a;
-                    let bk = _lock.kiesel_b;
-
-                    _lock.set_message(format!(
-                        "Spieler {0} ist am zug mit A: {1} und B: {2} ",
-                        player, ak, bk
-                    ));
-                } else {
-                    let movenr = _lock.zug;
-                    _lock.set_message(format!(
-                        "Spieler {0} hat eine ungültige Eingabe getätigt,",
-                        (movenr % 2 + 1)
-                    ));
+    if _lock.winner == 0 {
+        match rem_a {
+            Some(a) => match rem_b {
+                Some(b) => {
+                    if (a <= _lock.kiesel_a && b <= _lock.kiesel_b) && (b == a || b == 0 || a == 0)
+                    {
+                        _lock.ziehen();
+                        _lock.sub_a(a);
+                        _lock.sub_b(b);
+                        let player = (_lock.zug % 2 + 1) as i8;
+                        let ak = _lock.kiesel_a;
+                        let bk = _lock.kiesel_b;
+                        if ak == 0 && bk == 0 {
+                            _lock.set_winner(player);
+                            winsign(player);
+                            _lock.set_message(format!("Spieler {0} hat gewonnen!!!", player));
+                        } else {
+                            _lock.set_message(format!(
+                                "Spieler {0} ist am zug mit A: {1} und B: {2} ",
+                                player, ak, bk
+                            ));
+                        }
+                    } else {
+                        let movenr = _lock.zug;
+                        _lock.set_message(format!(
+                            "Spieler {0} hat eine ungültige Eingabe getätigt,",
+                            (movenr % 2 + 1)
+                        ));
+                    }
                 }
-            }
-
-            None => println!("es wurden keine Steine entfernt (B-Falsch)."),
-        },
-        None => println!("es wurden keine Steine entfernt (A-Falsch)."),
-    }
-    //Wincheck
-    if 0 == (_lock.kiesel_a + _lock.kiesel_b) {
-        if _lock.zug % 2 == 0 {
-            _lock.winner = 1;
-        } else {
-            _lock.winner = 2;
+                None => println!("es wurden keine Steine entfernt (B-Falsch)."),
+            },
+            None => println!("es wurden keine Steine entfernt (A-Falsch)."),
         }
-        winsign(_lock.winner);
+        let printable = Stacks {
+            lock: Mutex::new(()),
+            kiesel_a: _lock.kiesel_a,
+            kiesel_b: _lock.kiesel_b,
+            winner: _lock.winner,
+            a_sub: _lock.a_sub,
+            b_sub: _lock.b_sub,
+            zug: _lock.zug,
+            message: format!("{0}", _lock.message),
+        };
+        json!(printable)
+    } else {
+        let printable = Stacks {
+            lock: Mutex::new(()),
+            kiesel_a: _lock.kiesel_a,
+            kiesel_b: _lock.kiesel_b,
+            winner: _lock.winner,
+            a_sub: _lock.a_sub,
+            b_sub: _lock.b_sub,
+            zug: _lock.zug,
+            message: format!("{0}", _lock.message),
+        };
+        json!(printable)
     }
-    let printable = Stacks {
-        lock: Mutex::new(()),
-        kiesel_a: _lock.kiesel_a,
-        kiesel_b: _lock.kiesel_b,
-        winner: _lock.winner,
-        a_sub: _lock.a_sub,
-        b_sub: _lock.b_sub,
-        zug: _lock.zug,
-        message: format!("{0}", _lock.message),
-    };
-    json!(printable)
 }

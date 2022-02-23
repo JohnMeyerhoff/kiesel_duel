@@ -10,6 +10,7 @@ use std::sync::Mutex;
 use rocket::request::{self, FromRequest, Request};
 use rocket::response::content::Html;
 use serde::Deserialize;
+mod startpage;
 
 struct Stacks {
     lock: Mutex<()>,
@@ -103,16 +104,7 @@ fn rocket() -> _ {
 
 #[get("/")]
 fn index() -> Html<&'static str> {
-    Html(
-        r"
-<html>
-<head>
-<title>Kiesel Duell</title>
-</head>
-<body>Hello, you may visit <a href=http://127.0.0.1:8000/modularstate?move&rem_a=10&rem_b=10>this link</a> to play the game!
-</body>
-</html>",
-    )
+    return startpage::get_homepage();
 }
 
 #[get("/count")]

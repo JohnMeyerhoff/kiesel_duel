@@ -1,6 +1,6 @@
-use rocket::response::content::Html;
-pub fn get_homepage() -> Html<&'static str> {
-    Html(
+use rocket::response::content::RawHtml;
+pub fn get_homepage() -> RawHtml<&'static str> {
+    RawHtml(
         r"
         <html>
         <head>
@@ -33,8 +33,8 @@ td div.fill{
 }
 
 #[allow(dead_code)]
-pub fn get_simple_homepage() -> Html<&'static str> {
-    Html(
+pub fn get_simple_homepage() -> RawHtml<&'static str> {
+    RawHtml(
         r"
         <html>
         <head>

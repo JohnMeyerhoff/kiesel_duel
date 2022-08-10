@@ -7,9 +7,9 @@ use serde::ser::{Serialize, SerializeStruct, Serializer};
 use std::sync::Mutex;
 //currently no Arc
 //not in use yet:
-use rocket::request::{self, FromRequest, Request};
-use rocket::response::content::Html;
-use serde::Deserialize;
+
+use rocket::response::content::RawHtml;
+
 mod startpage;
 
 struct Stacks {
@@ -103,7 +103,7 @@ fn rocket() -> _ {
 }
 
 #[get("/")]
-fn index() -> Html<&'static str> {
+fn index() -> RawHtml<&'static str> {
     return startpage::get_homepage();
 }
 
@@ -114,13 +114,12 @@ fn count(state: &State<Mutex<Stacks>>) -> String {
     format!("Number of visits: {}", _lock.zug)
 }
 
-
 #[get("/newgame")]
-fn newgame(state: &State<Mutex<Stacks>>) -> Html<&'static str>{
+fn newgame(state: &State<Mutex<Stacks>>) -> RawHtml<&'static str> {
     let mut _lock = state.inner().lock().unwrap();
     *_lock = Stacks::new();
     println!("Spielstand zurueckgesetzt!");
-    return Html(
+    return RawHtml(
         r"
 <html>
 <head>
@@ -129,9 +128,8 @@ fn newgame(state: &State<Mutex<Stacks>>) -> Html<&'static str>{
 <body>Hello, a new game session started!
 </body>
 </html>",
-    )
+    );
 }
-
 
 #[get("/modularstate?move&<rem_a>&<rem_b>")]
 fn modularstate(state: &State<Mutex<Stacks>>, rem_a: Option<i8>, rem_b: Option<i8>) -> Value {

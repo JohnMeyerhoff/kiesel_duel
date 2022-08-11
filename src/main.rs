@@ -7,7 +7,7 @@ use serde::ser::{Serialize, SerializeStruct, Serializer};
 use std::sync::Mutex;
 //currently no Arc
 //not in use yet:
-
+use rocket::Shutdown;
 use rocket::response::content::RawHtml;
 
 mod startpage;
@@ -98,7 +98,7 @@ fn winsign(player: i8) {
 fn rocket() -> _ {
     let status = Mutex::new(Stacks::new());
     rocket::build()
-        .mount("/", routes![index, count, modularstate, newgame])
+        .mount("/", routes![index, count, modularstate, newgame, shutdown])
         .manage(status)
 }
 
@@ -112,6 +112,13 @@ fn count(state: &State<Mutex<Stacks>>) -> String {
     let mut _lock = state.inner().lock().unwrap();
     _lock.ziehen();
     format!("Number of visits: {}", _lock.zug)
+}
+
+
+#[get("/shutdown")]
+fn shutdown(shutdown: Shutdown) -> &'static str {
+    shutdown.notify();
+    "Shutting down..."
 }
 
 #[get("/newgame")]

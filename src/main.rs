@@ -1,19 +1,15 @@
 #[macro_use]
 extern crate rocket;
-
+use rocket::response::content::RawHtml;
 use rocket::serde::json::{json, Value};
+use rocket::Shutdown;
 use rocket::State;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 use std::sync::Mutex;
-//currently no Arc
-//not in use yet:
-use rocket::Shutdown;
-use rocket::response::content::RawHtml;
 
 mod startpage;
 
 struct Stacks {
-    lock: Mutex<()>,
     kiesel_a: i8,
     kiesel_b: i8,
     winner: i8,
@@ -26,7 +22,6 @@ struct Stacks {
 impl Stacks {
     pub fn new() -> Stacks {
         Stacks {
-            lock: Mutex::new(()),
             kiesel_a: 13,
             kiesel_b: 17,
             winner: 0,
@@ -43,31 +38,22 @@ oder von beiden Stapeln gleichviele Steine entfernt werden."
     }
 
     fn ziehen(&mut self) {
-        let _lock = self.lock.lock().unwrap();
         //Held until end of block
         self.zug += 1;
     }
 
     fn sub_a(&mut self, sub: i8) {
-        let _lock = self.lock.lock().unwrap();
-        //Held until end of block
         self.kiesel_a -= sub;
     }
 
     fn sub_b(&mut self, sub: i8) {
-        let _lock = self.lock.lock().unwrap();
-        //Held until end of block
         self.kiesel_b -= sub;
     }
 
     fn set_message(&mut self, message: String) {
-        let _lock = self.lock.lock().unwrap();
-        //Held until end of block
         self.message = message;
     }
     fn set_winner(&mut self, winner: i8) {
-        let _lock = self.lock.lock().unwrap();
-        //Held until end of block
         self.winner = winner;
     }
 }
@@ -113,7 +99,6 @@ fn count(state: &State<Mutex<Stacks>>) -> String {
     _lock.ziehen();
     format!("Number of visits: {}", _lock.zug)
 }
-
 
 #[get("/shutdown")]
 fn shutdown(shutdown: Shutdown) -> &'static str {
@@ -176,7 +161,6 @@ fn modularstate(state: &State<Mutex<Stacks>>, rem_a: Option<i8>, rem_b: Option<i
             None => println!("es wurden keine Steine entfernt (A-Falsch)."),
         }
         let printable = Stacks {
-            lock: Mutex::new(()),
             kiesel_a: _lock.kiesel_a,
             kiesel_b: _lock.kiesel_b,
             winner: _lock.winner,
@@ -188,7 +172,6 @@ fn modularstate(state: &State<Mutex<Stacks>>, rem_a: Option<i8>, rem_b: Option<i
         json!(printable)
     } else {
         let printable = Stacks {
-            lock: Mutex::new(()),
             kiesel_a: _lock.kiesel_a,
             kiesel_b: _lock.kiesel_b,
             winner: _lock.winner,

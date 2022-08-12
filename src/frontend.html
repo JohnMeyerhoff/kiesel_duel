@@ -1,8 +1,4 @@
-use rocket::response::content::RawHtml;
-pub fn get_homepage() -> RawHtml<&'static str> {
-    RawHtml(
-        r"
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang='en'>
 
 <head>
@@ -37,7 +33,7 @@ pub fn get_homepage() -> RawHtml<&'static str> {
             };
             a = document.getElementById('arem').value;
             b = document.getElementById('brem').value;
-            xhttp.open('GET', 'http://127.0.0.1:8000/modularstate?move&rem_a='+a+'&rem_b=' + b, true);
+            xhttp.open('GET', 'http://127.0.0.1:8000/modularstate?move&rem_a=' + a + '&rem_b=' + b, true);
             xhttp.send();
         }
     </script>
@@ -61,20 +57,4 @@ pub fn get_homepage() -> RawHtml<&'static str> {
         </div>
     </body>
 
-</html>",
-    )
-}
-
-#[allow(dead_code)]
-pub fn get_simple_homepage() -> RawHtml<&'static str> {
-    RawHtml(
-        r"
-        <html>
-        <head>
-        <title>Kiesel Duell</title>
-        </head>
-        <body>Hello, you may visit <a href=http://127.0.0.1:8000/modularstate?move&rem_a=10&rem_b=10>this link</a> to play the game!
-        </body>
-        </html>",
-    )
-}
+</html>

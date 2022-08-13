@@ -151,7 +151,7 @@ fn modularstate(state: &State<Mutex<Stacks>>, rem_a: Option<i8>, rem_b: Option<i
                         }
                     } else {
                         let movenr = _lock.zug;
-                        let player = (movenr % 2 +1 ) as i8;
+                        let player = (movenr % 2 + 1) as i8;
                         let ak = _lock.kiesel_a;
                         let bk = _lock.kiesel_b;
                         _lock.set_message(format!(

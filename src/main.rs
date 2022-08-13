@@ -4,10 +4,9 @@ use rocket::response::content::RawHtml;
 use rocket::serde::json::{json, Value};
 use rocket::Shutdown;
 use rocket::State;
+use rocket::fs::NamedFile;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 use std::sync::Mutex;
-
-mod startpage;
 
 struct Stacks {
     kiesel_a: i8,
@@ -89,8 +88,8 @@ fn rocket() -> _ {
 }
 
 #[get("/")]
-fn index() -> RawHtml<&'static str> {
-    return startpage::get_homepage();
+async fn index() -> Option<NamedFile> {
+    NamedFile::open("src/frontend.html").await.ok()
 }
 
 #[get("/count")]

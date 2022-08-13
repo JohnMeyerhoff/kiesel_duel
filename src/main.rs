@@ -1,10 +1,10 @@
 #[macro_use]
 extern crate rocket;
+use rocket::fs::NamedFile;
 use rocket::response::content::RawHtml;
 use rocket::serde::json::{json, Value};
 use rocket::Shutdown;
 use rocket::State;
-use rocket::fs::NamedFile;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 use std::sync::Mutex;
 
@@ -129,7 +129,9 @@ fn modularstate(state: &State<Mutex<Stacks>>, rem_a: Option<i8>, rem_b: Option<i
         match rem_a {
             Some(a) => match rem_b {
                 Some(b) => {
-                    if (a <= _lock.kiesel_a && b <= _lock.kiesel_b) && (b == a || b == 0 || a == 0)
+                    if (a <= _lock.kiesel_a && b <= _lock.kiesel_b)
+                        && (b == a || b == 0 || a == 0)
+                        && ((b + a) != 0)
                     {
                         _lock.ziehen();
                         _lock.sub_a(a);
@@ -149,9 +151,12 @@ fn modularstate(state: &State<Mutex<Stacks>>, rem_a: Option<i8>, rem_b: Option<i
                         }
                     } else {
                         let movenr = _lock.zug;
+                        let player = (movenr % 2 +1 ) as i8;
+                        let ak = _lock.kiesel_a;
+                        let bk = _lock.kiesel_b;
                         _lock.set_message(format!(
-                            "Spieler {0} hat eine ungültige Eingabe getätigt,",
-                            (movenr % 2 + 1)
+                            "Spieler {3} hat eine ungültige Eingabe getätigt , es wurden keine Steine entfernt.\nSpieler {0} ist am zug mit A: {1} und B: {2} ",
+                            player, ak, bk,(movenr % 2 + 1)
                         ));
                     }
                 }

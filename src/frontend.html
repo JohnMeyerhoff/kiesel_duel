@@ -18,9 +18,10 @@
             float: left;
             height: 20px;
             width: 20px;
-            margin-bottom: 15px;
+            margin: 5px;
             border: 1px solid black;
-            clear: both;
+            padding: 4px;
+            flex-wrap: wrap;
             background-color: blue;
         }
 
@@ -28,9 +29,10 @@
             float: left;
             height: 20px;
             width: 20px;
-            margin-bottom: 15px;
+            margin: 5px;
             border: 1px solid black;
-            clear: both;
+            padding: 4px;
+            flex-wrap: wrap;
             background-color: red;
         }
 
@@ -59,8 +61,8 @@
             xhttp.open('GET', 'http://127.0.0.1:8000/modularstate?move&rem_a=' + a + '&rem_b=' + b, true);
             xhttp.send();
         }
-        function restartView(){
-           document.getElementById('demo').innerHTML ='Spieler 1 ist am zug mit A: 13 und B: 17 ';
+        function restartView() {
+            document.getElementById('demo').innerHTML = 'Spieler 1 ist am zug mit A: 13 und B: 17 ';
         }
         function newgame() {
             var xhttp = new XMLHttpRequest();
@@ -75,8 +77,24 @@
         function updateView(raw) {
             x = JSON.parse(raw);
             document.getElementById('demo').innerHTML = x.message;
+            document.getElementById('arem').value = "";
+            document.getElementById('brem').value = "";
+            document.getElementById('left').innerHTML = "<bluebox></bluebox>".repeat(x.kiesel_a);
+            document.getElementById('right').innerHTML = "<redbox></redbox>".repeat(x.kiesel_b);
+            document.getElementById('arem').focus();
             // {'a_sub':0,'b_sub':0,'kiesel_a':2,'kiesel_b':11,'message':'Spieler 2 ist am zug mit A: 2 und B: 11 ','winner':0,'zug':7}
         }
+        function loadDocInit() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    updateView(this.responseText)
+                }
+            };
+            xhttp.open('GET', 'http://127.0.0.1:8000/modularstate?move&', true);
+            xhttp.send();
+        }
+        window.onload = loadDocInit();
     </script>
 </head>
 
@@ -105,7 +123,7 @@
                 </div>
 
                 <div id='right' style='width:50%;float:right'>
-                    <redbox></redbox>
+
                 </div>
             </div>
         </div>

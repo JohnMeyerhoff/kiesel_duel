@@ -58,7 +58,7 @@
             };
             a = document.getElementById('arem').value;
             b = document.getElementById('brem').value;
-            xhttp.open('GET', 'http://127.0.0.1:8000/modularstate?move&rem_a=' + a + '&rem_b=' + b, true);
+            xhttp.open('GET', '/modularstate?move&rem_a=' + a + '&rem_b=' + b, true);
             xhttp.send();
         }
         function restartView() {
@@ -71,7 +71,7 @@
                     restartView();
                 }
             };
-            xhttp.open('GET', 'http://127.0.0.1:8000/newgame', true);
+            xhttp.open('GET', '/newgame', true);
             xhttp.send();
         }
         function updateView(raw) {
@@ -91,7 +91,7 @@
                     updateView(this.responseText)
                 }
             };
-            xhttp.open('GET', 'http://127.0.0.1:8000/modularstate?move&', true);
+            xhttp.open('GET', '/modularstate?move&', true);
             xhttp.send();
         }
         window.onload = loadDocInit();

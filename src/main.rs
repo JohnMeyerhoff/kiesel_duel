@@ -83,6 +83,8 @@ fn winsign(player: i8) {
 fn rocket() -> _ {
     let status = Mutex::new(Stacks::new());
     rocket::build()
+        .attach(static_resources_initializer!(
+            "favicon" => "examples/front-end/images/favicon.ico",))
         .mount("/", routes![index, count, modularstate, newgame, shutdown])
         .manage(status)
 }
